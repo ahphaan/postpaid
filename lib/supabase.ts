@@ -56,3 +56,14 @@ export async function getAllPlans() {
   if (error) throw error;
   return data;
 }
+
+export async function logSearchMetric({ question, recommended_plans }: { question: string, recommended_plans: any[] }) {
+  const package_names = recommended_plans.map(plan => plan.package_name);
+  const { error } = await supabase.from('search_metrics').insert([
+    {
+      question,
+      recommended_package_names: package_names
+    }
+  ]);
+  if (error) console.error('Metric logging error:', error);
+}
