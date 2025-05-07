@@ -21,33 +21,45 @@ interface PostpaidPlan {
 
 export default function Home() {
   const [question, setQuestion] = useState("");
-  const [plans, setPlans] = useState<PostpaidPlan[]>([]);
+  const [allPlans, setAllPlans] = useState<PostpaidPlan[]>([]);
+  const [displayedPlans, setDisplayedPlans] = useState<PostpaidPlan[]>([]);
   const [loading, setLoading] = useState(false);
+  const [hasMore, setHasMore] = useState(false);
+  const PLANS_PER_PAGE = 3;
 
   const handleSearch = async () => {
     if (!question.trim()) return;
     
     setLoading(true);
     try {
-      const allPlans = await getAllPlans();
-      if (!allPlans || allPlans.length === 0) {
+      const plans = await getAllPlans();
+      if (!plans || plans.length === 0) {
         alert("No plans found in the database.");
         return;
       }
-      const topPlans = await rankPlansWithAI(question, allPlans);
-      console.log('Top Plans:', topPlans);
-      if (!topPlans || topPlans.length === 0) {
+      const rankedPlans = await rankPlansWithAI(question, plans);
+      console.log('Ranked Plans:', rankedPlans);
+      if (!rankedPlans || rankedPlans.length === 0) {
         alert("No matching packages found. Try different keywords.");
         return;
       }
-      await logSearchMetric({ question, recommended_plans: topPlans });
-      setPlans(topPlans);
+      await logSearchMetric({ question, recommended_plans: rankedPlans });
+      setAllPlans(rankedPlans);
+      setDisplayedPlans(rankedPlans.slice(0, PLANS_PER_PAGE));
+      setHasMore(rankedPlans.length > PLANS_PER_PAGE);
     } catch (error) {
       console.error('Error:', error);
       alert('An error occurred while processing your request.');
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleLoadMore = () => {
+    const currentLength = displayedPlans.length;
+    const newPlans = allPlans.slice(currentLength, currentLength + PLANS_PER_PAGE);
+    setDisplayedPlans([...displayedPlans, ...newPlans]);
+    setHasMore(currentLength + PLANS_PER_PAGE < allPlans.length);
   };
 
   return (
@@ -78,7 +90,7 @@ export default function Home() {
 
           {/* Results Section */}
           <div className="w-full grid gap-4 mt-8">
-            {plans.map((plan, idx) => (
+            {displayedPlans.map((plan, idx) => (
               <div
                 key={plan.id}
                 className={`p-6 rounded-lg border shadow-sm bg-card text-card-foreground ${idx === 0 ? 'border-green-600 bg-green-50' : ''}`}
@@ -90,7 +102,7 @@ export default function Home() {
                   </div>
                   <p className="text-primary font-medium">MVR{plan.cost}/month</p>
                 </div>
-                <div className="mt-4 grid grid-cols-2 gap-4">
+                <div className="mt-4 grid grid-cols-3 gap-4">
                   <div>
                     <p className="text-sm text-muted-foreground">Data</p>
                     <span className="relative group cursor-pointer">
@@ -109,10 +121,25 @@ export default function Home() {
                     <p className="text-sm text-muted-foreground">Local Calls</p>
                     <p>{plan.local_calls_mins}</p>
                   </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground">SMS</p>
+                    <p>{plan.local_sms}</p>
+                  </div>
                 </div>
               </div>
             ))}
           </div>
+
+          {/* Load More Button */}
+          {hasMore && (
+            <Button
+              onClick={handleLoadMore}
+              variant="outline"
+              className="mt-4"
+            >
+              Load More
+            </Button>
+          )}
         </main>
         {/* GitHub Link Footer */}
         <footer className="row-start-3 flex flex-col items-center justify-center mt-8">
