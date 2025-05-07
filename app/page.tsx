@@ -2,10 +2,11 @@
 
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { rankPlansWithAI } from "@/lib/ai";
 import { getAllPlans, logSearchMetric } from "@/lib/supabase";
 import Head from "next/head";
+import Link from "next/link";
 
 interface PostpaidPlan {
   id: string;
@@ -19,13 +20,28 @@ interface PostpaidPlan {
   local_sms: string;
 }
 
+const placeholders = [
+  "What's the best Dhiraagu package?",
+  "Show me packages with free SMS",
+  "Best package under MVR 500"
+];
+
 export default function Home() {
   const [question, setQuestion] = useState("");
   const [allPlans, setAllPlans] = useState<PostpaidPlan[]>([]);
   const [displayedPlans, setDisplayedPlans] = useState<PostpaidPlan[]>([]);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(false);
+  const [currentPlaceholder, setCurrentPlaceholder] = useState(0);
   const PLANS_PER_PAGE = 3;
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentPlaceholder((prev) => (prev + 1) % placeholders.length);
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   const handleSearch = async () => {
     if (!question.trim()) return;
@@ -73,7 +89,7 @@ export default function Home() {
           <div className="flex w-full items-center space-x-2">
             <Input 
               type="text" 
-              placeholder="Ask about postpaid packages..." 
+              placeholder={placeholders[currentPlaceholder]}
               className="w-full h-12 text-lg rounded-md"
               value={question}
               onChange={(e) => setQuestion(e.target.value)}
@@ -87,6 +103,9 @@ export default function Home() {
               {loading ? 'Searching...' : 'Search'}
             </Button>
           </div>
+          <Link href="/browse" className="text-primary hover:underline">
+            Browse and filter all plans
+          </Link>
 
           {/* Results Section */}
           <div className="w-full grid gap-4 mt-8">
