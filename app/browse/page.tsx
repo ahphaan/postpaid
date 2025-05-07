@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { getAllPlans } from "@/lib/supabase";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -50,54 +50,7 @@ export default function BrowsePlans() {
     sortOrder: 'asc'
   });
 
-  useEffect(() => {
-    loadPlans();
-  }, []);
-
-  const loadPlans = async () => {
-    try {
-      const allPlans = await getAllPlans();
-      setPlans(allPlans);
-      setFilteredPlans(allPlans);
-      
-      // Set initial ranges based on available plans
-      const prices = allPlans.map(p => p.cost || 0);
-      const dataValues = allPlans.map(p => {
-        if (!p.total_data) return 0;
-        const value = p.total_data.toLowerCase();
-        if (value.includes('unlimited')) return 1000; // Set a high value for unlimited
-        return parseFloat(value) || 0;
-      });
-      const voiceValues = allPlans.map(p => {
-        if (!p.local_calls_mins) return 0;
-        const value = p.local_calls_mins.toLowerCase();
-        if (value.includes('unlimited')) return 3000;
-        if (value.includes('2 free numbers')) return 3000;
-        return parseInt(value) || 0;
-      });
-      const smsValues = allPlans.map(p => {
-        if (!p.local_sms) return 0;
-        const value = p.local_sms.toLowerCase();
-        if (value.includes('unlimited')) return 5000;
-        return parseInt(value) || 0;
-      });
-      
-      setFilters(prev => ({
-        ...prev,
-        priceRange: [Math.min(...prices), Math.max(...prices)],
-        dataRange: [Math.min(...dataValues), Math.max(...dataValues)],
-        voiceRange: [Math.min(...voiceValues), Math.max(...voiceValues)],
-        smsRange: [Math.min(...smsValues), Math.max(...smsValues)],
-        providers: [...new Set(allPlans.map(p => p.provider || '').filter(Boolean))]
-      }));
-    } catch (error) {
-      console.error('Error loading plans:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const applyFilters = () => {
+  const applyFilters = useCallback(() => {
     let filtered = [...plans];
 
     // Apply price filter
@@ -166,12 +119,59 @@ export default function BrowsePlans() {
     });
 
     setFilteredPlans(filtered);
-  };
+  }, [plans, filters]);
 
-  // Call applyFilters whenever filters change
+  useEffect(() => {
+    const loadPlans = async () => {
+      try {
+        const allPlans = await getAllPlans();
+        setPlans(allPlans);
+        setFilteredPlans(allPlans);
+        
+        // Set initial ranges based on available plans
+        const prices = allPlans.map(p => p.cost || 0);
+        const dataValues = allPlans.map(p => {
+          if (!p.total_data) return 0;
+          const value = p.total_data.toLowerCase();
+          if (value.includes('unlimited')) return 1000;
+          return parseFloat(value) || 0;
+        });
+        const voiceValues = allPlans.map(p => {
+          if (!p.local_calls_mins) return 0;
+          const value = p.local_calls_mins.toLowerCase();
+          if (value.includes('unlimited')) return 3000;
+          if (value.includes('2 free numbers')) return 3000;
+          return parseInt(value) || 0;
+        });
+        const smsValues = allPlans.map(p => {
+          if (!p.local_sms) return 0;
+          const value = p.local_sms.toLowerCase();
+          if (value.includes('unlimited')) return 5000;
+          return parseInt(value) || 0;
+        });
+        
+        setFilters(prev => ({
+          ...prev,
+          priceRange: [Math.min(...prices), Math.max(...prices)],
+          dataRange: [Math.min(...dataValues), Math.max(...dataValues)],
+          voiceRange: [Math.min(...voiceValues), Math.max(...voiceValues)],
+          smsRange: [Math.min(...smsValues), Math.max(...smsValues)],
+          providers: [...new Set(allPlans.map(p => p.provider || '').filter(Boolean))]
+        }));
+      } catch (error) {
+        console.error('Error loading plans:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadPlans();
+  }, []);
+
+  // Apply filters whenever they change
   useEffect(() => {
     applyFilters();
-  }, [filters]);
+  }, [applyFilters]);
 
   return (
     <div className="min-h-screen p-8">
