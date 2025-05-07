@@ -7,6 +7,7 @@ import { rankPlansWithAI } from "@/lib/ai";
 import { getAllPlans, logSearchMetric } from "@/lib/supabase";
 import Head from "next/head";
 import Link from "next/link";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 interface PostpaidPlan {
   id: string;
@@ -85,7 +86,10 @@ export default function Home() {
       </Head>
       <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
         <main className="flex flex-col gap-[32px] row-start-2 items-center w-full max-w-4xl">
-          <h1 className="text-2xl font-semibold text-center">Find the ideal postpaid package for you.</h1>
+          <div className="flex justify-between items-center w-full">
+            <h1 className="text-2xl font-semibold text-center">Find the ideal postpaid package for you.</h1>
+            <ThemeToggle />
+          </div>
           <div className="flex w-full items-center space-x-2">
             <Input 
               type="text" 

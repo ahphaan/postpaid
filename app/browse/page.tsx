@@ -10,6 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { ThemeToggle } from "@/components/theme-toggle";
 import Link from "next/link";
 
 interface PostpaidPlan {
@@ -173,9 +174,12 @@ export default function BrowsePlans() {
       <div className="max-w-7xl mx-auto">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-2xl font-semibold">Browse Plans</h1>
-          <Link href="/" className="text-primary hover:underline">
-            Back to AI Search
-          </Link>
+          <div className="flex items-center gap-4">
+            <ThemeToggle />
+            <Link href="/" className="text-primary hover:underline">
+              Back to AI Search
+            </Link>
+          </div>
         </div>
 
         {/* Filters Section */}
