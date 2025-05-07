@@ -3,8 +3,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { getAllPlans } from "@/lib/supabase";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Slider } from "@/components/ui/slider";
 import {
   Select,
   SelectContent,
@@ -39,7 +37,6 @@ interface FilterState {
 export default function BrowsePlans() {
   const [plans, setPlans] = useState<PostpaidPlan[]>([]);
   const [filteredPlans, setFilteredPlans] = useState<PostpaidPlan[]>([]);
-  const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState<FilterState>({
     priceRange: [0, 2000],
     dataRange: [0, 100],
@@ -160,8 +157,6 @@ export default function BrowsePlans() {
         }));
       } catch (error) {
         console.error('Error loading plans:', error);
-      } finally {
-        setLoading(false);
       }
     };
 
