@@ -5,6 +5,19 @@ const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 
 export const supabase = createClient(supabaseUrl, supabaseKey)
 
+export interface PostpaidPlan {
+  id: string;
+  provider: string;
+  package_name: string;
+  cost: number;
+  total_data: string;
+  data_breakdown: string;
+  local_calls_mins: string;
+  network_calls_mins: string;
+  local_sms: string;
+  // Add other fields as needed
+}
+
 export async function searchPackages(keywords: string[]) {
   let query = supabase.from('postpaid_plans').select('*')
   
@@ -51,13 +64,13 @@ export async function searchPackages(keywords: string[]) {
   return data
 }
 
-export async function getAllPlans() {
+export async function getAllPlans(): Promise<PostpaidPlan[]> {
   const { data, error } = await supabase.from('postpaid_plans').select('*');
   if (error) throw error;
-  return data;
+  return data as PostpaidPlan[];
 }
 
-export async function logSearchMetric({ question, recommended_plans }: { question: string, recommended_plans: any[] }) {
+export async function logSearchMetric({ question, recommended_plans }: { question: string, recommended_plans: PostpaidPlan[] }) {
   const package_names = recommended_plans.map(plan => plan.package_name);
   const { error } = await supabase.from('search_metrics').insert([
     {

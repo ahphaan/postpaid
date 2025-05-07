@@ -1,6 +1,7 @@
 'use server'
 
 import { GoogleGenAI } from "@google/genai"
+import type { PostpaidPlan } from "./supabase";
 
 const ai = new GoogleGenAI({
     apiKey: process.env.GOOGLE_AI_API_KEY!,
@@ -23,7 +24,7 @@ export async function analyzeQuestion(question: string){
     return response.text;
 }
 
-export async function rankPlansWithAI(question: string, plans: any[]) {
+export async function rankPlansWithAI(question: string, plans: PostpaidPlan[]) {
     const plansText = plans.map((plan, idx) =>
         `Plan ${idx + 1}:
 Provider: ${plan.provider}
