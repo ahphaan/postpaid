@@ -73,5 +73,5 @@ The app also logs each search in a `search_metrics` table:
 - `recommended_package_names` (text[]) – array of package names in ranked order
 
 ## Links
-- [Live Demo](#) <!-- Add link if deployed -->
+- [Live Demo](https://postpaid-sage.vercel.app/)
 - [GitHub Repository](https://github.com/ahphaan/postpaid)
