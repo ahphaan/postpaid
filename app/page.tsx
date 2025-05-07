@@ -3,7 +3,7 @@
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
-import { analyzeQuestion, rankPlansWithAI } from "@/lib/ai";
+import { rankPlansWithAI } from "@/lib/ai";
 import { getAllPlans, logSearchMetric } from "@/lib/supabase";
 import Head from "next/head";
 

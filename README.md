@@ -1,36 +1,77 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Postpaid Plan Picker
+
+A Next.js app to help users find the ideal postpaid mobile package using natural language queries, Google Gemini AI, and Supabase.
+
+## Features
+- Ask questions about postpaid plans in natural language
+- AI-powered semantic search and ranking (Gemini)
+- Fetches and displays top 3 relevant plans from Supabase
+- Clean, responsive UI with Tailwind CSS
+- Tooltip for data breakdowns, provider and cost highlighting
+- GitHub link in footer
+- **Metrics tracking:** Logs each search (question and recommended package names) in Supabase for analytics
 
 ## Getting Started
 
-First, run the development server:
+### 1. Clone the repository
+```bash
+git clone https://github.com/ahphaan/postpaid.git
+cd postpaid
+```
 
+### 2. Install dependencies
+```bash
+npm install
+# or
+yarn install
+```
+
+### 3. Set up environment variables
+Create a `.env.local` file in the root directory with the following:
+```env
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+GOOGLE_AI_API_KEY=your_gemini_api_key
+```
+
+### 4. Run the development server
 ```bash
 npm run dev
 # or
 yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Usage
+- Type a question about postpaid plans (e.g., "Ooredoo plan under 500 with at least 10GB data")
+- The app will show the top 3 most relevant plans
+- Hover over the * next to data to see breakdowns (if available)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Database Schema
+The app expects a `postpaid_plans` table in Supabase with columns:
+- `id` (UUID, primary key)
+- `provider` (text)
+- `package_name` (text)
+- `cost` (integer)
+- `total_data` (text)
+- `data_breakdown` (text)
+- `data_rollover` (boolean)
+- `local_calls_mins` (text)
+- `network_calls_mins` (text)
+- `local_sms` (text)
+- `excess_sms_charge` (numeric)
+- `excess_call_charge` (numeric)
+- `credit_limit` (integer)
+- `excess_data_charge` (text)
 
-## Learn More
+### Metrics Table
+The app also logs each search in a `search_metrics` table:
+- `id` (UUID, primary key)
+- `created_at` (timestamp)
+- `question` (text)
+- `recommended_package_names` (text[]) – array of package names in ranked order
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Links
+- [Live Demo](#) <!-- Add link if deployed -->
+- [GitHub Repository](https://github.com/ahphaan/postpaid)
